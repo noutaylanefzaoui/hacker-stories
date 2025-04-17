@@ -21,20 +21,22 @@ const list = [
   }
 ];
 
-function Search() {
+const Search = () => {
+  const handleChange = (event) => {
+    console.log(event);
+    console.log(event.target.value);
+  };
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" />
+      <input id="search" type="text" onChange={handleChange} />
     </div>
   );
-}
+};
 
-function List({ list }) {
-  return (
+const List = () => (
     <ul>
-      {list.map(function (item) {
-        return (
+      {list.map((item) => (
           <li key={item.objectID}>
             <span>
               <a href={item.url}> {item.title}</a>
@@ -43,18 +45,15 @@ function List({ list }) {
             <span> | Comments: {item.num_comments}</span>
             <span> | Points: {item.points}</span>
           </li>
-        );
-      })}
+      ))}
     </ul>
   );
-}
 
 function getTitle(title) {
   return `Title: ${title}`;
 }
 
-function App() {
-  return (
+const App = () => (
     <div>
       <h1>My Hacker Stories</h1>
       <Search />
@@ -68,6 +67,5 @@ function App() {
       </ul>
     </div>
   );
-}
 
 export default App;
