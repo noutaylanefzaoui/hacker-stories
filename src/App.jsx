@@ -2,6 +2,7 @@ import React from "react"; // Import React
 import reactLogo from "./assets/react.svg"; // Tell Webpack to load this file
 import viteLogo from "/vite.svg";
 import "./App.css";
+const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
 const App = () => {
   const initialStories = [
@@ -40,9 +41,27 @@ const App = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
-  const searchedStories = stories.filter(function (story) {
-    return story.title.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isError, setIsError] = React.useState(false);
+  const [url, setUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
+  const handleSearchSubmit = () => {
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
+  };
+
+  React.useEffect(() => {
+    setIsLoading(true);
+    fetch(url)
+      .then((response) => response.json())
+      .then((result) => {
+        setStories(result.hits);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsError(true);
+        setIsLoading(false);
+      });
+  }, [url]);
+
   return (
     <div>
       <h1>My Hacker Stories</h1>
@@ -54,7 +73,16 @@ const App = () => {
         Search:
       </InputWithLabel>
       <hr />
-      <List list={searchedStories} onRemove={handleRemoveStory} />
+      {isError && <p>Something went wrong ...</p>}
+      {isLoading ? (
+        <p>Loading ...</p>
+      ) : (
+        <List list={stories} onRemoveItem={handleRemoveStory} />
+      )}
+      <List list={stories} onRemoveItem={handleRemoveStory} />
+      <button type="button" disabled={!searchTerm} onClick={handleSearchSubmit}>
+        Submit
+      </button>
     </div>
   );
 };
